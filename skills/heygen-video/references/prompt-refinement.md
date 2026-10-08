@@ -1,6 +1,6 @@
 # HeyGen prompt refinement
 
-Based on the user's supplied documentation and the official [How to prompt it](https://developers.heygen.com/docs/models/heygen-video#how-to-prompt-it) and [Prompt enhancement](https://developers.heygen.com/docs/models/heygen-video#prompt-enhancement) sections, checked 2026-10-05.
+Based on HeyGen's official [How to prompt it](https://developers.heygen.com/docs/models/heygen-video#how-to-prompt-it) and [Prompt enhancement](https://developers.heygen.com/docs/models/heygen-video#prompt-enhancement) sections, checked 2026-10-05.
 
 ## Rewrite the brief
 
@@ -22,7 +22,7 @@ Write concrete direction, usually a few hundred to a few thousand characters whe
 
 ## Style cues
 
-The names below come from the **Twelve styles** gallery in the user's pasted HeyGen documentation. The cues are writing guidance for expanding a selected style, not additional API settings or guaranteed results. Name the medium and its visible characteristics; use only cues that fit the brief.
+The names below come from the **Twelve styles** gallery in HeyGen's [model documentation](https://developers.heygen.com/docs/models/heygen-video). The cues are writing guidance for expanding a selected style, not additional API settings or guaranteed results. Name the medium and its visible characteristics; use only cues that fit the brief.
 
 | Style | Useful direction to add to the prompt |
 | --- | --- |

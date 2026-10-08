@@ -4,3 +4,9 @@ __pycache__/
 *.py[cod]
 .DS_Store
 /outputs/
+
+# Generated videos and job records (may hold prompts, inline media, signed URLs)
+*.mp4
+*.part
+job.json
+*.job.json

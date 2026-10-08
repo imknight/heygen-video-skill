@@ -27,7 +27,7 @@ Example requests:
 
 ## Show available options
 
-Treat `$heygen-video`, `$heygen-video options`, `show options`, and `show all options` without a generation brief as requests for the complete options overview. Run the options command and present all categories in plain language: modes, resolution, duration, aspect ratios, Codex prompt refinement, HeyGen `prompt_enhancement`, all 12 styles, sound, seed, media requirements, defaults, estimated pricing, and the cost-confirmation step. Show advanced callbacks and input limits compactly at the end. An options-only request does not upload media or generate a video and needs no key. A narrow question may receive a focused answer.
+Treat `$heygen-video`, `$heygen-video options`, `show options`, and `show all options` without a generation brief as requests for the complete options overview. Run the options command and present all categories in plain language: modes, resolution, duration, aspect ratios, skill prompt refinement, HeyGen `prompt_enhancement`, all 12 styles, sound, seed, media requirements, defaults, estimated pricing, and the cost-confirmation step. Show advanced callbacks and input limits compactly at the end. An options-only request does not upload media or generate a video and needs no key. A narrow question may receive a focused answer.
 
 For a generation brief that leaves mode or resolution unspecified, present the relevant choices with a recommendation; preserve choices already supplied. Do not require the user to configure every advanced setting or repeat the full menu after they have chosen. Include their final settings and price in the confirmation before generation.
 
@@ -38,11 +38,11 @@ python3 <skill-dir>/scripts/heygen_video.py options
 | Setting | Available choices |
 | --- | --- |
 | Mode | **Text to video**: describe a new scene. **Image to video**: animate an image as the first frame. **Reference to video**: use supplied images/videos to guide a new scene, with optional audio references. |
-| Resolution | **480p**: cheaper draft; **768p**: more detail. These are size classes; exact dimensions depend on the aspect ratio. |
+| Resolution | **480p**: cheaper draft; **768p**: more detail; **1080p** and **2k**: highest detail at 3× the 768p rate, 16:9 or 9:16 only. These are size classes; exact dimensions depend on the aspect ratio. |
 | Duration | Any whole number from **5 to 15 seconds**. |
 | Aspect ratio | **21:9** ultrawide, **16:9** landscape, **4:3**, **1:1** square, **3:4**, **9:16** vertical. Reference mode also supports **adaptive**. Image mode follows the first frame. |
-| Codex prompt refinement | Say **refine prompt** or **enhance prompt** to see an improved prompt first. Add **and generate** to continue to the estimate-and-confirm step. Refinement alone makes no HeyGen API call. |
-| HeyGen `prompt_enhancement` | **turbo**: fast expansion (API default); **quality**: more thorough expansion; **disabled**: send the prompt unchanged. This happens inside HeyGen before generation. The skill uses **disabled** after Codex refinement unless explicitly overridden. |
+| Skill prompt refinement | Say **refine prompt** or **enhance prompt** to see an improved prompt first. Add **and generate** to continue to the estimate-and-confirm step. Refinement alone makes no HeyGen API call. |
+| HeyGen `prompt_enhancement` | **turbo**: fast expansion (API default); **quality**: more thorough expansion; **disabled**: send the prompt unchanged. This happens inside HeyGen before generation. The skill uses **disabled** after its own refinement unless explicitly overridden. |
 | Seed | Omit for a random variation, or choose **0–4294967295** for repeatable iteration within a deployment. Every completed video delivery includes the actual returned seed for reuse. |
 | Sound | Describe dialogue, ambience, effects, and music in the prompt. There is no separate audio toggle in this API schema. |
 | Visual style | The 12 documented examples below, or a custom style described by the user. Style is written into the prompt. |
@@ -64,7 +64,7 @@ python3 <skill-dir>/scripts/heygen_video.py options
 
 When the user asks for styles, list all 12. Accept a style name in a generation or refinement request, or its number when referring to this displayed list. Read the style cues in [references/prompt-refinement.md](references/prompt-refinement.md#style-cues) when applying one. These are examples from HeyGen's documentation, not an exhaustive list or API presets: do not send a `style` field. A style selection alone does not authorize generation or trigger the full refinement workflow. For example: `$heygen-video enhance prompt: a dancing character, plasticine stop-motion style, 10 seconds, 768p.`
 
-Advanced inputs are `image` for image mode; `reference_images`, `reference_videos`, and `reference_audio` for reference mode; and optional HTTPS `callback_url` plus `callback_id` (at most 256 characters) for completion notifications. Media accepts an uploaded asset ID, direct HTTPS URL, or inline base64 (`type`, `media_type`, `data`). Upload and reference limits are documented under Prepare the request and in the model source. The fixed model is `heygen-video-1`; `prompt` accepts 1–32,000 characters.
+Advanced inputs are `image` for image mode; `reference_images`, `reference_videos`, and `reference_audio` for reference mode; and optional HTTPS `callback_url` plus `callback_id` (at most 256 characters) for completion notifications. HeyGen attempts each callback only once, so still poll for status. Media accepts an uploaded asset ID, direct HTTPS URL, or inline base64 (`type`, `media_type`, `data`). Upload and reference limits are documented under Prepare the request and in the model source. The fixed model is `heygen-video-1`; `prompt` accepts 1–32,000 characters.
 
 Explain the image/reference distinction when useful: image mode starts on the exact supplied frame, while reference mode puts supplied subjects into a newly described scene. Include the relevant current cost estimate when recommending resolution or mode.
 
@@ -93,7 +93,9 @@ Write a JSON request in the user's output folder. Choose explicit `mode` and `re
 - `text_to_video`: prompt only, without media fields.
 - `image_to_video`: add `image`, e.g. `{"type":"asset_id","asset_id":"ID"}`. The image is the literal first frame; omit `aspect_ratio`, and crop the image first if another shape is needed.
 - `reference_to_video`: add `reference_images` and/or `reference_videos`; optional `reference_audio`. Each entry uses the same asset format. Address them as `<Picture 1>`, `<Video 1>`, `<Audio 1>` in list order. Audio alone is insufficient. Up to 9 images, 3 videos, 3 audio files, 12 total. `adaptive` is allowed for this mode.
-- Other aspect ratios: `21:9`, `4:3`, `1:1`, `3:4`. Resolutions: `480p`, `768p`.
+- Other aspect ratios: `21:9`, `4:3`, `1:1`, `3:4`. Resolutions: `480p`, `768p`, `1080p`, `2k`. `1080p` and `2k` need `16:9` or `9:16` (set it explicitly in reference mode; in image mode the first frame must already have that shape).
+- HeyGen reads only the first 5 seconds of each reference video. HeyGen rejects unknown fields, so never add extra keys such as `style`.
+- Run `python3 <skill-dir>/scripts/heygen_video.py validate --request /absolute/path/request.json` to check a request offline. `create` runs the same checks.
 - A media object can alternatively be `{"type":"url","url":"https://..."}`. URLs must be directly accessible without redirects. Prefer asset uploads for local files.
 - Use `prompt_enhancement: "disabled"` for fully directed prompts; `turbo` or `quality` for prompts that need expansion. Optional `seed` is an unsigned 32-bit integer for repeatable iteration within a deployment.
 
@@ -130,7 +132,7 @@ Pricing was checked on 2026-10-05. Published launch rates through October 2026, 
 | Text/image | 0.010 | 0.015 |
 | Reference | 0.020 | 0.030 |
 
-Published standard rates from November are double these rates. Reference mode bills input video seconds plus output seconds. The script switches to the published standard rates on November 1 using Asia/Kuala_Lumpur dates; it is an estimate, not a live billing quote. Verify current official pricing when using this skill in a later session, especially near the promotion cutoff (provider timezone unspecified) or after any pricing change. Update stale estimates before relying on them; do not promise a discount based solely on this saved table.
+Published standard rates from November are double these rates. Reference mode bills input video seconds plus output seconds. The script switches to the published standard rates on November 1 (UTC); it is an estimate, not a live billing quote. `1080p` and `2k` estimates use the developer docs' 3× 768p multiplier, which the pricing article does not list. When the saved rates are more than 30 days old, the estimate reports `pricing_stale: true`: check the pricing source before quoting it. Verify current official pricing when using this skill in a later session, especially near the promotion cutoff (provider timezone unspecified) or after any pricing change. Update stale estimates before relying on them; do not promise a discount based solely on this saved table.
 
 ## Retrieve and deliver
 
@@ -138,7 +140,7 @@ Published standard rates from November are double these rates. Reference mode bi
 python3 <skill-dir>/scripts/heygen_video.py status --job /absolute/path/job.json --output /absolute/path/video.mp4
 ```
 
-For `pending` or `processing`, check again after about 10 seconds, using short waits so progress can be communicated. Stop active polling after 10 minutes; preserve the job and report its current state so it can be resumed. For `completed`, the command downloads the MP4 and prints its absolute path. Inspect the result with available media tools, report any unverified aspects, and present the saved video with an absolute Markdown media link. Never claim a simulated test was a live render.
+For `pending` or `processing`, add `--wait` to poll every 10 seconds for up to 10 minutes (`--timeout`, `--interval` adjust this), or check again manually. If it is still unfinished, preserve the job and report its current state so it can be resumed. For `completed`, the command downloads the MP4 and prints its absolute path. Inspect the result with available media tools, report any unverified aspects, and present the saved video with an absolute Markdown media link. Never claim a simulated test was a live render.
 
 Always include **Seed: `<actual seed>`** in the final delivery for each completed clip, including when the user did not specify a seed. Read it from the completed response or the saved job's `result.seed`; the script already saves and prints that response. Link the saved job record so the prompt, inputs, settings, and seed can be found together. If HeyGen did not return a seed, say it is unavailable rather than inventing one or claiming a submitted value was confirmed.
 
