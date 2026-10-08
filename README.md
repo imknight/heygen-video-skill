@@ -1,5 +1,7 @@
 # HeyGen Video Skill
 
+Created by [imknight](https://github.com/imknight).
+
 A Codex and Claude Code skill for generating short video clips with sound using HeyGen's `heygen-video-1` model. Start from a text description, animate an image, or guide a scene with reference media.
 
 The skill can refine prompts, list options, estimate costs, submit jobs, and download completed videos with their returned seeds. It supports 5–15 second clips at 480p, 768p, 1080p, or 2k, and checks requests against HeyGen's schema before spending. It does not cover HeyGen's talking-avatar workflows.
