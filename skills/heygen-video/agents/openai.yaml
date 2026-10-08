@@ -1,0 +1,4 @@
+interface:
+  display_name: "HeyGen Video"
+  short_description: "Generate HeyGen video clips with sound and cost estimates"
+  default_prompt: "Use $heygen-video to generate a short video from my brief and show the estimated cost."
