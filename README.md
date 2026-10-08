@@ -1,5 +1,7 @@
 # HeyGen Video Skill
 
+![HeyGen Video Skill cover](assets/heygen-video-cover.png)
+
 Created by [imknight](https://github.com/imknight).
 
 A Codex and Claude Code skill for generating short video clips with sound using HeyGen's `heygen-video-1` model. Start from a text description, animate an image, or guide a scene with reference media.
